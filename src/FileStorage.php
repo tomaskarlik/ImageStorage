@@ -269,15 +269,33 @@ class FileStorage extends Nette\Object {
     
     /**
      * @param string $file
+     * @param mixed|NULL $namespace
      * @return boolean
      */
-    public function delete($file) {
-	$file = $this->getFile($file);
+    public function delete($file, $namespace = NULL) {
+	$file = $this->getFile($file, $namespace);
 	if (file_exists($file)) {
 	    return unlink($file);
 	}
 
 	return TRUE;
+    }
+
+    /**
+     * @param string $filename
+     * @return array name, extension
+     * @throws FileStorageException
+     */    
+    public static function getFilePartsFromName($filename) {
+
+	if (!preg_match('/(^.*)\.([^.]+)$/D', $filename, $m)) {
+	    throw new FileStorageException("Invalid file name - no extension!");
+	}
+
+	return [
+	  'name' => $m[1],
+	  'extension' => $m[2]
+	];
     }
 
 }

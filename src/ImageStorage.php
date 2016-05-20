@@ -106,15 +106,18 @@ class ImageStorage extends Nette\Object {
      * @throws FileStorageException
      */
     public function save(FileUpload $upload, $name, $overwrite = FALSE) {
+
 	if ((!FileStorage::isEmptyUpload($upload)) 
 		&& (!$upload->isImage())) {
 	    throw new FileStorageException("File is not image!");
-	}		
+	}
+	
+	$fileInfo = FileStorage::getFilePartsFromName($name);
 	$this->fileStorage->save($upload, $name, $overwrite); //save to "original"
 	if ($overwrite) { //try delete old thumbs
-	    $this->deleteThumbs($name);
+	    $this->deleteThumbs($fileInfo['name']);
 	}
-	$this->generateThumbsCache($name);
+	$this->generateThumbsCache($fileInfo['name']);
     }
     
     /**
@@ -133,8 +136,9 @@ class ImageStorage extends Nette\Object {
 	    throw new FileStorageException("File is not image!");
 	}
 	
+	$fileInfo = FileStorage::getFilePartsFromName($name);
 	$this->fileStorage->copy($from, $name);
-	$this->generateThumbsCache($name);
+	$this->generateThumbsCache($fileInfo['name']);
     }
             
     /**     
@@ -202,10 +206,10 @@ class ImageStorage extends Nette\Object {
     }
     
     /**
-     * @param string $file
+     * @param string $name
      * @throws FileStorageException
      */
-    private function generateThumbsCache($file) {
+    private function generateThumbsCache($name) {
 
 	if (is_array($this->sizes) && count($this->sizes)) {
 	    foreach ($this->sizes as $size) {
@@ -216,10 +220,9 @@ class ImageStorage extends Nette\Object {
 
 		$width = (int) $m[1];
 		$height = (int) $m[2];
-		$name = pathinfo($file, PATHINFO_FILENAME);
 
 		$namespace = $this->getNamespace();
-		$original = $this->fileStorage->getFile($file);
+		$original = $this->fileStorage->getFile($name);
 		$thumbDir = $this->getPictureThumbDirectory($namespace, $width, $height, Image::FIT, self::DEFAULT_QUALITY_JPEG);
 		$thumbFile = $this->fileStorage->getWebDir() . '/' . $thumbDir . '/' . $name . self::THUMB_EXTENSION;
 
@@ -241,15 +244,13 @@ class ImageStorage extends Nette\Object {
      * @return string
      */
     public function getPictureLink($namespace, $picture, $extension, $width = NULL, $height = NULL, $flag = NULL, $quality = NULL) {
-	
+
 	if ($extension === NULL) {
-	    if (!preg_match('/(^.*)\.([^.]+)$/D', $picture, $m)) {
-		throw new FileStorageException("Must define extension or filename must be in format <name>.<extension>!");
-	    }
-	    $picture = $m[1];
-	    $extension = $m[2];
+	    $fileParts = FileStorage::getFilePartsFromName($picture);
+	    $picture = $fileParts['name'];
+	    $extension = $fileParts['extension'];
 	}
-	
+
 	if ((!$width) && (!$height)) { //no resize, get original
 	    return $this->fileStorage->getFileLink($namespace, $picture . "." . $extension);
 	}
@@ -317,7 +318,7 @@ class ImageStorage extends Nette\Object {
 	foreach ($files as $file) {
 	    $return[] = $file->getPathname();
 	}
-
+	
 	return $return;
     }
 
@@ -355,10 +356,11 @@ class ImageStorage extends Nette\Object {
     
     /**
      * @param string $name
+     * @param mixed|NULL $namespace
      * @return string
      */
-    public function getOrignalFile($name) {
-	return $this->fileStorage->getFile($name);
+    public function getOrignalFile($name, $namespace) {
+	return $this->fileStorage->getFile($name, $namespace);
     }
 
 }
