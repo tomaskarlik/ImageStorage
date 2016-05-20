@@ -132,10 +132,13 @@ class FileStorage extends Nette\Object {
 
     /**
      * @param string|NULL $file
+     * @param mixed|NULL $namespace
      * @return string
      */
-    private function getUploadSavePath($file = NULL) {	
-	$uploadFilePath = $this->getWebDir() . '/' . $this->getWebFilePath() . '/' . $this->getNamespace();
+    private function getUploadSavePath($file = NULL, $namespace = NULL) {
+	$namespace = ($namespace ? self::getNamespaceDescription($namespace) : $this->getNamespace());
+
+	$uploadFilePath = $this->getWebDir() . '/' . $this->getWebFilePath() . '/' . $namespace;
 	if ($file !== NULL) {
 	    $uploadFilePath .= '/' . $file;
 	}
@@ -257,10 +260,11 @@ class FileStorage extends Nette\Object {
     
     /**      
      * @param string $file
+     * @param mixed|NULL $namespace
      * @return string pathame
      */
-    public function getFile($file) {
-	return $this->getUploadSavePath($file);	
+    public function getFile($file, $namespace = NULL) {
+	return $this->getUploadSavePath($file, $namespace);	
     }
     
     /**

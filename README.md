@@ -40,3 +40,15 @@ nette:
 			
 ```
 
+Template
+```latte
+<img n:img="'namespace', $item->picture, NULL, 320, 240, \Nette\Utils\Image::EXACT" alt="{$item->name}">
+<img n:img="'namespace', 'picture', 'jpg'"> <!-- define extension of original file sepratly -->
+```
+
+Save image
+```php
+ $this->image->setNamespace('myNamespace');
+ $this->image->save($upload, $filename);
+
+```

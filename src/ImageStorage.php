@@ -233,7 +233,7 @@ class ImageStorage extends Nette\Object {
     /**     
      * @param mixed $namespace
      * @param string $picture
-     * @param string $extension
+     * @param string|NULL $extension
      * @param int|NULL $width
      * @param int|NULL $height
      * @param int|NULL $flag
@@ -241,6 +241,15 @@ class ImageStorage extends Nette\Object {
      * @return string
      */
     public function getPictureLink($namespace, $picture, $extension, $width = NULL, $height = NULL, $flag = NULL, $quality = NULL) {
+	
+	if ($extension === NULL) {
+	    if (!preg_match('/(^.*)\.([^.]+)$/D', $picture, $m)) {
+		throw new FileStorageException("Must define extension or filename must be in format <name>.<extension>!");
+	    }
+	    $picture = $m[1];
+	    $extension = $m[2];
+	}
+	
 	if ((!$width) && (!$height)) { //no resize, get original
 	    return $this->fileStorage->getFileLink($namespace, $picture . "." . $extension);
 	}
@@ -249,7 +258,7 @@ class ImageStorage extends Nette\Object {
 	$quality = ($quality ? : self::DEFAULT_QUALITY_JPEG); //jpeg default image quality
 
 	$directory = $this->getPictureThumbDirectory($namespace, $width, $height, $flag, $quality);
-	$origFile = $this->fileStorage->getFile($picture . '.' . $extension);
+	$origFile = $this->fileStorage->getFile($picture . '.' . $extension, $namespace);
 	$thumbFile = $this->fileStorage->getWebDir() . '/' . $directory . '/' . $picture . self::THUMB_EXTENSION;
 	
 	if (!file_exists($thumbFile)) { //create thumb
