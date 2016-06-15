@@ -345,7 +345,12 @@ class ImageStorage extends Nette\Object {
      * @param string $extension picture original extension
      * @throws FileStorageException
      */
-    public function deletePicture($name, $extension) {
+    public function deletePicture($name, $extension = NULL) {
+	if ($extension === NULL) {
+	    $fileParts = FileStorage::getFilePartsFromName($name);
+	    $name = $fileParts['name'];
+	    $extension = $fileParts['extension'];
+	}
 	if (!$this->deleteThumbs($name)) {
 	    throw new FileStorageException('Error delete thumbs!');
 	}
