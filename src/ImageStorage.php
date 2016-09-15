@@ -21,7 +21,7 @@ use Nette\Utils\Finder;
  */
 class ImageStorage extends Nette\Object {
     
-    const DEFAULT_QUALITY_JPEG = 80;
+    const DEFAULT_QUALITY_JPEG = 95;
     const THUMB_EXTENSION = ".jpg";
     
     /**
@@ -104,6 +104,7 @@ class ImageStorage extends Nette\Object {
      * @param string $name
      * @param bool $overwrite
      * @throws FileStorageException
+     * @throws ImageStorageThumbException
      */
     public function save(FileUpload $upload, $name, $overwrite = FALSE) {
 
@@ -124,6 +125,7 @@ class ImageStorage extends Nette\Object {
      * @param string $from
      * @param string $name
      * @throws FileStorageException
+     * @throws ImageStorageThumbException
      */
     public function copy($from, $name) {
 	
@@ -207,15 +209,15 @@ class ImageStorage extends Nette\Object {
     
     /**
      * @param string $name
-     * @throws FileStorageException
+     * @throws ImageStorageThumbException
      */
     private function generateThumbsCache($name) {
 
 	if (is_array($this->sizes) && count($this->sizes)) {
 	    foreach ($this->sizes as $size) {
 
-		if (!preg_match("#^([0-9]+)x([0-9]+)$#i", $size, $m)) { //check sizes settings
-		    throw new FileStorageException("Invalid size - thumbs cache generator!");
+		if ( ! preg_match("#^([0-9]+)x([0-9]+)$#i", $size, $m)) { //check sizes settings
+		    throw new ImageStorageThumbException("Invalid size - thumbs cache generator!");
 		}
 
 		$width = (int) $m[1];
@@ -226,8 +228,8 @@ class ImageStorage extends Nette\Object {
 		$thumbDir = $this->getPictureThumbDirectory($namespace, $width, $height, Image::FIT, self::DEFAULT_QUALITY_JPEG);
 		$thumbFile = $this->fileStorage->getWebDir() . '/' . $thumbDir . '/' . $name . self::THUMB_EXTENSION;
 
-		if (!$this->createThumb($original, $thumbFile, $width, $height, Image::FIT, self::DEFAULT_QUALITY_JPEG)) {
-		    throw new FileStorageException("Error creating thumb {$name}!");
+		if ( ! $this->createThumb($original, $thumbFile, $width, $height, Image::FIT, self::DEFAULT_QUALITY_JPEG)) {
+		    throw new ImageStorageThumbException("Error creating thumb {$name}!");
 		}
 	    }
 	}
