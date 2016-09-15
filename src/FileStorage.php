@@ -18,7 +18,8 @@ use Nette\Http\FileUpload;
 /**
  * File storage
  */
-class FileStorage extends Nette\Object {
+class FileStorage extends Nette\Object
+{
 
     /**
      * @var string
@@ -50,7 +51,7 @@ class FileStorage extends Nette\Object {
 	$this->wwwDir = $wwwDir;
 	$this->wwwFilePath = $path;
 	$this->basePath = $basePath;
-	
+
 	$this->setNamespace($namespace);
     }
 

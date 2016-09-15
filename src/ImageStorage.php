@@ -19,8 +19,9 @@ use Nette\Utils\Finder;
 /**
  * Image storage
  */
-class ImageStorage extends Nette\Object {
-    
+class ImageStorage extends Nette\Object
+{
+
     const DEFAULT_QUALITY_JPEG = 95;
     const THUMB_EXTENSION = ".jpg";
     
@@ -118,7 +119,7 @@ class ImageStorage extends Nette\Object {
 	if ($overwrite) { //try delete old thumbs
 	    $this->deleteThumbs($fileInfo['name']);
 	}
-	$this->generateThumbsCache($fileInfo['name']);
+	$this->generateThumbsCache($fileInfo['name'], $fileInfo['extension']);
     }
     
     /**
@@ -140,7 +141,7 @@ class ImageStorage extends Nette\Object {
 	
 	$fileInfo = FileStorage::getFilePartsFromName($name);
 	$this->fileStorage->copy($from, $name);
-	$this->generateThumbsCache($fileInfo['name']);
+	$this->generateThumbsCache($fileInfo['name'], $fileInfo['extension']);
     }
             
     /**     
@@ -209,9 +210,10 @@ class ImageStorage extends Nette\Object {
     
     /**
      * @param string $name
+     * @param string $extension
      * @throws ImageStorageThumbException
      */
-    private function generateThumbsCache($name) {
+    private function generateThumbsCache($name, $extension) {
 
 	if (is_array($this->sizes) && count($this->sizes)) {
 	    foreach ($this->sizes as $size) {
@@ -224,7 +226,7 @@ class ImageStorage extends Nette\Object {
 		$height = (int) $m[2];
 
 		$namespace = $this->getNamespace();
-		$original = $this->fileStorage->getFile($name);
+		$original = $this->fileStorage->getFile($name . '.' . $extension, $namespace);		
 		$thumbDir = $this->getPictureThumbDirectory($namespace, $width, $height, Image::FIT, self::DEFAULT_QUALITY_JPEG);
 		$thumbFile = $this->fileStorage->getWebDir() . '/' . $thumbDir . '/' . $name . self::THUMB_EXTENSION;
 
@@ -366,7 +368,7 @@ class ImageStorage extends Nette\Object {
      * @param mixed|NULL $namespace
      * @return string
      */
-    public function getOrignalFile($name, $namespace) {
+    public function getOrignalFile($name, $namespace = NULL) {
 	return $this->fileStorage->getFile($name, $namespace);
     }
 
