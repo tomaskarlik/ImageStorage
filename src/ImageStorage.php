@@ -22,6 +22,7 @@ use Nette\Utils\Finder;
 class ImageStorage extends Nette\Object
 {
 
+    const DEFAULT_BACKGROUND_COLOR = array('red' => 255, 'green' => 255, 'blue' => 255);
     const DEFAULT_QUALITY_JPEG = 95;
     const THUMB_EXTENSION = ".jpg";
     
@@ -230,7 +231,7 @@ class ImageStorage extends Nette\Object
 		$thumbDir = $this->getPictureThumbDirectory($namespace, $width, $height, Image::FIT, self::DEFAULT_QUALITY_JPEG);
 		$thumbFile = $this->fileStorage->getWebDir() . '/' . $thumbDir . '/' . $name . self::THUMB_EXTENSION;
 
-		if ( ! $this->createThumb($original, $thumbFile, $width, $height, Image::FIT, self::DEFAULT_QUALITY_JPEG)) {
+		if ( ! $this->createThumb($original, $thumbFile, $width, $height, Image::FIT, self::DEFAULT_QUALITY_JPEG, self::DEFAULT_BACKGROUND_COLOR)) {
 		    throw new ImageStorageThumbException("Error creating thumb {$name}!");
 		}
 	    }
@@ -245,9 +246,10 @@ class ImageStorage extends Nette\Object
      * @param int|NULL $height
      * @param int|NULL $flag
      * @param int|NULL $quality
+     * @oram bool $forceNoThumbBrowserCache
      * @return string
      */
-    public function getPictureLink($namespace, $picture, $extension, $width = NULL, $height = NULL, $flag = NULL, $quality = NULL) {
+    public function getPictureLink($namespace, $picture, $extension, $width = NULL, $height = NULL, $flag = NULL, $quality = NULL, $forceNoThumbBrowserCache = FALSE) {
 
 	if ($extension === NULL) {
 	    $fileParts = FileStorage::getFilePartsFromName($picture);
@@ -267,12 +269,16 @@ class ImageStorage extends Nette\Object
 	$thumbFile = $this->fileStorage->getWebDir() . '/' . $directory . '/' . $picture . self::THUMB_EXTENSION;
 	
 	if (!file_exists($thumbFile)) { //create thumb
-	    if (!$this->createThumb($origFile, $thumbFile, $width, $height, $flag, $quality)) {
+	    if (!$this->createThumb($origFile, $thumbFile, $width, $height, $flag, $quality, self::DEFAULT_BACKGROUND_COLOR)) {
 		return ""; //error create thumb
 	    }
 	}
 
-	return $this->getBasePath() . "/" . $directory . "/" . $picture . self::THUMB_EXTENSION;
+	$link = $this->getBasePath() . "/" . $directory . "/" . $picture . self::THUMB_EXTENSION;
+	if ($forceNoThumbBrowserCache) {
+	    $link .= '?_cahe=' . time();
+	}
+	return $link;
     }
 
     /**     
@@ -282,21 +288,31 @@ class ImageStorage extends Nette\Object
      * @param int|NULL $height
      * @param int $flags
      * @param int $quality
+     * @param array|NULL $backgroundColor
      * @return FALSE
      */
-    private function createThumb($source, $destination, $width, $height, $flags, $quality) {
-	if (!file_exists($source)) { //original not exists
+    private function createThumb($source, $destination, $width, $height, $flags, $quality, $backgroundColor = NULL) {
+	if ( ! file_exists($source)) { //original not exists
 	    return FALSE;
 	}
 
 	$dir = dirname($destination);
-	if ((!file_exists($dir))
-		&& (!mkdir($dir, 0777, TRUE))) { //directory not exists and not posible create it
+	if (( ! file_exists($dir))
+		&& ( ! mkdir($dir, 0777, TRUE))) { //directory not exists and not posible create it
 	    return FALSE;
 	}
 
 	try {
-	    $image = Image::fromFile($source);
+	    if (is_array($backgroundColor)) {
+		$sourceImage = Image::fromFile($source);
+		$image = Image::fromBlank($sourceImage->getWidth(), $sourceImage->getHeight(), $backgroundColor);
+		$image->place($sourceImage, 0, 0);
+		$sourceImage = NULL;
+
+	    } else {
+		$image = Image::fromFile($source);
+	    }
+
 	    $image->resize($width, $height, $flags);
 	    $image->save($destination, $quality, Image::JPEG);
 	    $image = NULL;
