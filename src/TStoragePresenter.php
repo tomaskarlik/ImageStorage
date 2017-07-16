@@ -20,36 +20,38 @@ use TomasKarlik\Storages\ImageStorage;
  * FileStorage
  * inject service to presenter
  */
-trait TStoragePresenter {
+trait TStoragePresenter
+{
 
-    /**
-     * @inject
-     * @var ImageStorage
-     */
-    public $imageStorage;
+	/**
+	 * @inject
+	 * @var ImageStorage
+	 */
+	public $imageStorage;
 
-    /**
-     * @inject
-     * @var FileStorage
-     */
-    public $fileStorage;
- 
+	/**
+	 * @inject
+	 * @var FileStorage
+	 */
+	public $fileStorage;
 
-    /**
-     * @param ITemplate $template
-     * @return ITemplate
-     */
-    public function createTemplate($template = NULL) {
-	$template = $template ? : parent::createTemplate();
-	$basePath = $this->getHttpRequest()->getUrl()->getBaseUrl();
 
-	$this->imageStorage->setBasePath($basePath);	
-	$template->imageStorage = $this->imageStorage;
-	
-	$this->fileStorage->setBasePath($basePath);
-	$template->fileStorage = $this->fileStorage;
+	/**
+	 * @param ITemplate $template
+	 * @return ITemplate
+	 */
+	public function createTemplate($template = NULL)
+	{
+		$template = $template ? : parent::createTemplate();
+		$basePath = $this->getHttpRequest()->getUrl()->getBaseUrl();
 
-	return $template;
-    }
+		$this->imageStorage->setBasePath($basePath);
+		$template->imageStorage = $this->imageStorage;
+
+		$this->fileStorage->setBasePath($basePath);
+		$template->fileStorage = $this->fileStorage;
+
+		return $template;
+	}
 
 }

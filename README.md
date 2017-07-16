@@ -4,7 +4,7 @@ Keep original file without changes.
 Requirements
 ------------
 
-ImageStorage / FileStorage requires PHP 5.4 or higher.
+ImageStorage / FileStorage requires PHP 5.6 or higher.
 
 - [Nette Framework](https://github.com/nette/nette)
 

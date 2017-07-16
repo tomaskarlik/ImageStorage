@@ -13,6 +13,7 @@ namespace TomasKarlik\Storages;
 
 use Exception;
 
+
 class ImageStorageThumbException extends Exception
 {
 
