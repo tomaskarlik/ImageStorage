@@ -173,8 +173,6 @@ class FileStorage extends NObject
 					$val *= 1024;
 				case 'k':
 					$val *= 1024;
-				default:
-					return FALSE;
 			}
 
 			return $val;
