@@ -1,6 +1,6 @@
 {
 	"name": "tomaskarlik/storages",
-	"description": "File aNd image storage.",
+	"description": "File and image storage.",
 	"keywords": ["image", "file", "storage", "nette"],
 	"license": "BSD-3",
 	"authors": [
