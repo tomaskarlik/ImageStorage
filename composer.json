@@ -2,7 +2,7 @@
 	"name": "tomaskarlik/storages",
 	"description": "File and image storage.",
 	"keywords": ["image", "file", "storage", "nette"],
-	"license": "BSD-3",
+	"license": "BSD-3-Clause",
 	"authors": [
 		{ "name": "Tomáš Karlík", "homepage": "http://tomaskarlik.cz" }
 	],
