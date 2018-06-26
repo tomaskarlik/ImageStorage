@@ -13,7 +13,7 @@ namespace TomasKarlik\Storages;
 
 use Exception;
 use Nette\Http\FileUpload;
-use Nette\Object AS NObject;
+use Nette\SmartObject;
 use Nette\Utils\Finder;
 use Nette\Utils\Image;
 
@@ -27,6 +27,9 @@ class ImageStorage extends NObject
 	const DEFAULT_BACKGROUND_COLOR = ['red' => 255, 'green' => 255, 'blue' => 255];
 	const DEFAULT_QUALITY_JPEG = 95;
 	const THUMB_EXTENSION = ".jpg";
+
+	use SmartObject;
+
 
 	/**
 	 * @var FileStorage

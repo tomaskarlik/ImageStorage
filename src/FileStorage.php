@@ -13,15 +13,18 @@ namespace TomasKarlik\Storages;
 
 use Exception;
 use Nette\Http\FileUpload;
-use Nette\Object AS NObject;
+use Nette\SmartObject;
 use Nette\Utils\Strings;
 
 
 /**
  * File storage
  */
-class FileStorage extends NObject
+class FileStorage
 {
+
+	use SmartObject;
+
 
 	/**
 	 * @var string
