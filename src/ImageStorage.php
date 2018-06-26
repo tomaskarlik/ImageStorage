@@ -21,7 +21,7 @@ use Nette\Utils\Image;
 /**
  * Image storage
  */
-class ImageStorage extends NObject
+class ImageStorage
 {
 
 	const DEFAULT_BACKGROUND_COLOR = ['red' => 255, 'green' => 255, 'blue' => 255];
